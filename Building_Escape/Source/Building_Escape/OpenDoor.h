@@ -26,19 +26,27 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private: // Private attributes
-	float InitialYaw, CurrentYaw;
+	float InitialAngle, CurrentAngle;
 
-	UPROPERTY(EditAnywhere) // Exposing the TargetYaw in the editor and the blueprints
-	float TargetYaw = 90.f;
+	UPROPERTY(EditAnywhere) // Exposing the OpenAngle in the editor and the blueprints
+	float OpenAngle = 90.f;
+
+	float DoorLastOpened = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float DoorCloseDelay = .5f; // Time that passes before starting to close the door
+
+	UPROPERTY(EditAnywhere)
+	float OpeningSpeed = .8f;
+	
+	UPROPERTY(EditAnywhere)
+	float  ClosingSpeed = 2.f;
 
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate;
 
 	UPROPERTY(EditAnywhere) // Exposing what opens our door
 	AActor* ActorThatOpens;
-
-	float DoorLastOpened = 0.f;
-	float DoorCloseDelay = .5f; // Time that passes before starting to close the door
 
 private: // Private functions
 	void OpenDoor(float DeltaTime);

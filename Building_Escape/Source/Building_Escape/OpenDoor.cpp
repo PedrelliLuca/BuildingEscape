@@ -20,9 +20,9 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitialYaw = GetOwner()->GetActorRotation().Yaw;
-	CurrentYaw = InitialYaw;
-	TargetYaw += InitialYaw;
+	InitialAngle = GetOwner()->GetActorRotation().Yaw;
+	CurrentAngle = InitialAngle;
+	OpenAngle += InitialAngle;
 
 	if (!PressurePlate)
 		UE_LOG(LogTemp, Error, TEXT("%s has OpenDoor component but no PressurePlate is set!"), *GetOwner()->GetName());
@@ -50,15 +50,15 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 void UOpenDoor::OpenDoor(float DeltaTime)
 {
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
- 	CurrentYaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * .8f);
-	DoorRotation.Yaw = CurrentYaw;
+ 	CurrentAngle = FMath::Lerp(CurrentAngle, OpenAngle, DeltaTime * OpeningSpeed);
+	DoorRotation.Yaw = CurrentAngle;
 	GetOwner()->SetActorRotation(DoorRotation);
 }
 
 void UOpenDoor::CloseDoor(float DeltaTime)
 {
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
- 	CurrentYaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * 2.f);
-	DoorRotation.Yaw = CurrentYaw;
+ 	CurrentAngle = FMath::Lerp(CurrentAngle, InitialAngle, DeltaTime * ClosingSpeed);
+	DoorRotation.Yaw = CurrentAngle;
 	GetOwner()->SetActorRotation(DoorRotation);
 }
