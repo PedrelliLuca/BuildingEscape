@@ -34,8 +34,10 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
 	UE_LOG(LogTemp, Warning, TEXT("The transform is %s.\nThe yaw is %f."), *DoorRotation.ToString(), DoorRotation.Yaw);
 
-	// To get a door that opens slower over time
-	CurrentYaw = FMath::Lerp(CurrentYaw, TargetYaw, 0.02f);
+	// Multiplying by DeltaTime (1/FPS) makes the door open a bigger angle per frame
+	// on slow computer. E.g. : 10fps -> 100ms delta -> 2 each frame.
+	// 100fps -> 1ms delta -> 0.02 each frame
+	CurrentYaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * .8f);
 	DoorRotation.Yaw = CurrentYaw;
 	GetOwner()->SetActorRotation(DoorRotation);
 
