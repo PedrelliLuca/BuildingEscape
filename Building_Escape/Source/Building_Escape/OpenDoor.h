@@ -39,5 +39,6 @@ private: // Private attributes
 
 
 private: // Private functions
-	void OpenDoor(float DeltaTime);	
+	void OpenDoor(float DeltaTime);
+	void CloseDoor(float DeltaTime);
 };
