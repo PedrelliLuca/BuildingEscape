@@ -12,9 +12,7 @@ UOpenDoor::UOpenDoor()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
-}
+ }
 
 
 // Called when the game starts
@@ -40,8 +38,12 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	// Polling
 	if (PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
+	{
 		OpenDoor(DeltaTime);
-	else
+		DoorLastOpened = GetWorld()->GetTimeSeconds();
+	}
+	// The door starts closing some seconds after leaving the trigger volume
+	else if (GetWorld()->GetTimeSeconds() - DoorLastOpened > DoorCloseDelay)
 		CloseDoor(DeltaTime);
 }
 
@@ -56,7 +58,7 @@ void UOpenDoor::OpenDoor(float DeltaTime)
 void UOpenDoor::CloseDoor(float DeltaTime)
 {
 	FRotator DoorRotation = GetOwner()->GetActorRotation();
- 	CurrentYaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * .8f);
+ 	CurrentYaw = FMath::Lerp(CurrentYaw, InitialYaw, DeltaTime * 2.f);
 	DoorRotation.Yaw = CurrentYaw;
 	GetOwner()->SetActorRotation(DoorRotation);
 }

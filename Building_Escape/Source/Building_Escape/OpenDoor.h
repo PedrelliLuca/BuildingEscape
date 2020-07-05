@@ -37,6 +37,8 @@ private: // Private attributes
 	UPROPERTY(EditAnywhere) // Exposing what opens our door
 	AActor* ActorThatOpens;
 
+	float DoorLastOpened = 0.f;
+	float DoorCloseDelay = .5f; // Time that passes before starting to close the door
 
 private: // Private functions
 	void OpenDoor(float DeltaTime);
