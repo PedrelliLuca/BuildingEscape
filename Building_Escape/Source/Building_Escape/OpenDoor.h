@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Engine/TriggerVolume.h" // To add ATriggerVolume
 #include "OpenDoor.generated.h"
 
 
@@ -24,10 +25,19 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-private:
+private: // Private attributes
 	float InitialYaw, CurrentYaw;
 
 	UPROPERTY(EditAnywhere) // Exposing the TargetYaw in the editor and the blueprints
 	float TargetYaw = 90.f;
-	
+
+	UPROPERTY(EditAnywhere)
+	ATriggerVolume* PressurePlate;
+
+	UPROPERTY(EditAnywhere) // Exposing what opens our door
+	AActor* ActorThatOpens;
+
+
+private: // Private functions
+	void OpenDoor(float DeltaTime);	
 };

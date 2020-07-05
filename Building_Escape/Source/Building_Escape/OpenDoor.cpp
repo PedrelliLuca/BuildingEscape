@@ -1,6 +1,8 @@
 // Copyright Luca Pedrelli 2020.
 
 
+#include "Engine/World.h" // GetWorld()
+#include "GameFramework/PlayerController.h" // APlayerController
 #include "OpenDoor.h"
 #include "GameFramework/Actor.h"
 
@@ -23,6 +25,11 @@ void UOpenDoor::BeginPlay()
 	InitialYaw = GetOwner()->GetActorRotation().Yaw;
 	CurrentYaw = InitialYaw;
 	TargetYaw += InitialYaw;
+
+	if (!PressurePlate)
+		UE_LOG(LogTemp, Error, TEXT("%s has OpenDoor component but no PressurePlate is set!"), *GetOwner()->GetName());
+
+	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 
@@ -31,18 +38,15 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FRotator DoorRotation = GetOwner()->GetActorRotation();
-	UE_LOG(LogTemp, Warning, TEXT("The transform is %s.\nThe yaw is %f."), *DoorRotation.ToString(), DoorRotation.Yaw);
-
-	// Multiplying by DeltaTime (1/FPS) makes the door open a bigger angle per frame
-	// on slow computer. E.g. : 10fps -> 100ms delta -> 2 each frame.
-	// 100fps -> 1ms delta -> 0.02 each frame
-	CurrentYaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * .8f);
-	DoorRotation.Yaw = CurrentYaw;
-	GetOwner()->SetActorRotation(DoorRotation);
-
-	// To get a door that opens at a fixed speed over time (linear interpolation)
-	// DoorRotation.Yaw = FMath::FInterpConstantTo(DoorRotation.Yaw, TargetYaw, DeltaTime, 45.f);
-
+	// Polling
+	if (PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
+		OpenDoor(DeltaTime);
 }
 
+void UOpenDoor::OpenDoor(float DeltaTime)
+{
+	FRotator DoorRotation = GetOwner()->GetActorRotation();
+ 	CurrentYaw = FMath::Lerp(CurrentYaw, TargetYaw, DeltaTime * .8f);
+	DoorRotation.Yaw = CurrentYaw;
+	GetOwner()->SetActorRotation(DoorRotation);
+}
