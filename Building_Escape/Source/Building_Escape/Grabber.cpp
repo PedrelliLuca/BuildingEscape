@@ -1,9 +1,9 @@
 // Copyright Luca Pedrelli 2020.
 
+#include "Grabber.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h" // GetWorld()
 #include "GameFramework/PlayerController.h" // For viewport
-#include "Grabber.h"
 
 // Macro to make clear where we define out parameters
 #define OUT
@@ -24,8 +24,12 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Grabber of %s reporting for duty"), *GetOwner()->GetName())
-	
+	// Check for the PhysicsHandle component. Returns the 1st component found
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (!PhysicsHandle)
+		UE_LOG(LogTemp, Error, TEXT("UPhysicsHandleComponent not found on %s"),
+			*GetOwner()->GetName()
+		);
 }
 
 
