@@ -27,17 +27,22 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere)
-	float Reach = 100.f;
+	float Reach = 200.f;
 
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 	UInputComponent* InputComponent = nullptr;
 
+	// These are called at BeginPlay
 	void FindPhysicsHandle();
 	void SetupInputComponent();
 
+	// These are called at key events
 	void Grab();
 	void Release();
 	
 	// Returns the first actor within reach with a physics body
 	FHitResult GetFirstPhysicsBodyInReach() const;
+
+	FVector GetPlayerLocation() const;
+	FVector GetLineTraceEnd() const;
 };
