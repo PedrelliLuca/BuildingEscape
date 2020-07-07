@@ -18,13 +18,12 @@ public:
 	// Sets default values for this component's properties
 	UGrabber();
 
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -33,6 +32,12 @@ private:
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 	UInputComponent* InputComponent = nullptr;
 
+	void FindPhysicsHandle();
+	void SetupInputComponent();
+
 	void Grab();
 	void Release();
+	
+	// Returns the first actor within reach with a physics body
+	FHitResult GetFirstPhysicsBodyInReach() const;
 };
