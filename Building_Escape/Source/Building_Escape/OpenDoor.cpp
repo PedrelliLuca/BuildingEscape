@@ -2,15 +2,19 @@
 
 
 #include "OpenDoor.h"
+#include "Components/PrimitiveComponent.h" // GetMass
 #include "Engine/World.h" // GetWorld()
 #include "GameFramework/PlayerController.h" // APlayerController
 #include "GameFramework/Actor.h"
 
+// Macro to make clear where we define out parameters
+#define OUT
+
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
+	// Set this component to be initialized when the game starts, and to be ticked every frame.
+	// You can turn these features off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
  }
 
@@ -22,12 +26,10 @@ void UOpenDoor::BeginPlay()
 
 	InitialAngle = GetOwner()->GetActorRotation().Yaw;
 	CurrentAngle = InitialAngle;
-	OpenAngle += InitialAngle;
+	OpenAngle += InitialAngle; // So that the door opens 90 degrees regardless of its angle with the world axes
 
 	if (!PressurePlate)
 		UE_LOG(LogTemp, Error, TEXT("%s has OpenDoor component but no PressurePlate is set!"), *GetOwner()->GetName());
-
-	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 
@@ -36,13 +38,14 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// Polling
-	if (PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
+	// Polling, because we check each frame
+	// OpenDoor if mass in the volume is enough
+	if (TotalMassOfActors() > MassToOpen)
 	{
 		OpenDoor(DeltaTime);
 		DoorLastOpened = GetWorld()->GetTimeSeconds();
 	}
-	// The door starts closing some seconds after leaving the trigger volume
+	// If mass isn't enough anymore, the door starts closing some seconds
 	else if (GetWorld()->GetTimeSeconds() - DoorLastOpened > DoorCloseDelay)
 		CloseDoor(DeltaTime);
 }
@@ -61,4 +64,17 @@ void UOpenDoor::CloseDoor(float DeltaTime)
  	CurrentAngle = FMath::Lerp(CurrentAngle, InitialAngle, DeltaTime * ClosingSpeed);
 	DoorRotation.Yaw = CurrentAngle;
 	GetOwner()->SetActorRotation(DoorRotation);
+}
+
+float UOpenDoor::TotalMassOfActors() const
+{
+	// Find all overlapping actors
+	TArray<AActor*> OverlappingActors;
+	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
+	// Add up the actors masses
+	float TotalMass = 0.f;
+	for (AActor* OverlappingActor : OverlappingActors)
+		TotalMass += OverlappingActor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+
+	return TotalMass;
 }

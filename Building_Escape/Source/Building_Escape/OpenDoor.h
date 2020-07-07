@@ -45,10 +45,11 @@ private: // Private attributes
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate;
 
-	UPROPERTY(EditAnywhere) // Exposing what opens our door
-	AActor* ActorThatOpens;
+	UPROPERTY(EditAnywhere)
+	float MassToOpen = 60.f;
 
 private: // Private functions
 	void OpenDoor(float DeltaTime);
 	void CloseDoor(float DeltaTime);
+	float TotalMassOfActors() const;
 };
