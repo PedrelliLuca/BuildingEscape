@@ -30,6 +30,19 @@ void UGrabber::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("UPhysicsHandleComponent not found on %s"),
 			*GetOwner()->GetName()
 		);
+
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (InputComponent)
+	{	
+		// The string param has to be the same you setup in Project Settings
+		// the 4th parameter is a ptr to the function you want to call when the event happens
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
+	}
+	else 
+		// It's impossible to end up in here, Unreal automatically adds a hidden UInputComponent to
+		// every actor.
+		UE_LOG(LogTemp, Error, TEXT("UInputComponent not found on %s"), *GetOwner()->GetName());
 }
 
 
@@ -86,3 +99,12 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		UE_LOG(LogTemp, Warning, TEXT("Hit actor %s!"), *ActorHit->GetName());
 }
 
+void UGrabber::Grab()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Grabbed!!"));
+}
+
+void UGrabber::Release()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Released!!"));
+}
