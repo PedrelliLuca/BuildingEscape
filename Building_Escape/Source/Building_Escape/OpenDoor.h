@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/AudioComponent.h"
 #include "Engine/TriggerVolume.h" // To add ATriggerVolume
 #include "OpenDoor.generated.h"
 
@@ -45,6 +46,9 @@ private: // Private attributes
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate = nullptr;
 
+	UPROPERTY()
+	UAudioComponent* AudioComponent = nullptr;
+
 	UPROPERTY(EditAnywhere)
 	float MassToOpen = 60.f;
 
@@ -52,4 +56,5 @@ private: // Private functions
 	void OpenDoor(float DeltaTime);
 	void CloseDoor(float DeltaTime);
 	float TotalMassOfActors() const;
+	bool bIsOpening = false; // switch for playing the door audio just once at opening and closing
 };

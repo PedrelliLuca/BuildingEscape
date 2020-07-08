@@ -28,6 +28,10 @@ void UOpenDoor::BeginPlay()
 	CurrentAngle = InitialAngle;
 	OpenAngle += InitialAngle; // So that the door opens 90 degrees regardless of its angle with the world axes
 
+	AudioComponent = GetOwner()->FindComponentByClass<UAudioComponent>();
+	if (!AudioComponent)
+		UE_LOG(LogTemp, Error, TEXT("%s has OpenDoor component but no AudioComponent is set!"), *GetOwner()->GetName());
+
 	if (!PressurePlate)
 		UE_LOG(LogTemp, Error, TEXT("%s has OpenDoor component but no PressurePlate is set!"), *GetOwner()->GetName());
 }
@@ -45,7 +49,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 		OpenDoor(DeltaTime);
 		DoorLastOpened = GetWorld()->GetTimeSeconds();
 	}
-	// If mass isn't enough anymore, the door starts closing some seconds
+	// If mass isn't enough anymore, the door starts closing after some seconds
 	else if (GetWorld()->GetTimeSeconds() - DoorLastOpened > DoorCloseDelay)
 		CloseDoor(DeltaTime);
 }
@@ -56,6 +60,16 @@ void UOpenDoor::OpenDoor(float DeltaTime)
  	CurrentAngle = FMath::Lerp(CurrentAngle, OpenAngle, DeltaTime * OpeningSpeed);
 	DoorRotation.Yaw = CurrentAngle;
 	GetOwner()->SetActorRotation(DoorRotation);
+
+	if (!AudioComponent)
+		return;
+
+	// Since this function is called repeatedly we need to check that the audio is played only once
+	if (!bIsOpening)
+	{
+		AudioComponent->Play();
+		bIsOpening = true;
+	}
 }
 
 void UOpenDoor::CloseDoor(float DeltaTime)
@@ -64,6 +78,16 @@ void UOpenDoor::CloseDoor(float DeltaTime)
  	CurrentAngle = FMath::Lerp(CurrentAngle, InitialAngle, DeltaTime * ClosingSpeed);
 	DoorRotation.Yaw = CurrentAngle;
 	GetOwner()->SetActorRotation(DoorRotation);
+
+	if (!AudioComponent)
+		return;
+		
+	// Since this function is called repeatedly we need to check that the audio is played only once
+	if (bIsOpening)
+	{
+		AudioComponent->Play();
+		bIsOpening = false;
+	}
 }
 
 float UOpenDoor::TotalMassOfActors() const
@@ -73,7 +97,7 @@ float UOpenDoor::TotalMassOfActors() const
 	if(!PressurePlate)
 		return TotalMass;
 	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
-	
+
 	// Add up the actors masses
 	for (AActor* OverlappingActor : OverlappingActors)
 		TotalMass += OverlappingActor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
