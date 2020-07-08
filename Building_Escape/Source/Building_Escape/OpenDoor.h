@@ -34,7 +34,7 @@ private: // Private attributes
 	float DoorLastOpened = 0.f;
 
 	UPROPERTY(EditAnywhere)
-	float DoorCloseDelay = .5f; // Time that passes before starting to close the door
+	float DoorCloseDelay = .4f; // Time that passes before starting to close the door
 
 	UPROPERTY(EditAnywhere)
 	float OpeningSpeed = .8f;
@@ -43,7 +43,7 @@ private: // Private attributes
 	float  ClosingSpeed = 2.f;
 
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* PressurePlate;
+	ATriggerVolume* PressurePlate = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float MassToOpen = 60.f;

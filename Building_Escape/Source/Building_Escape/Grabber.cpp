@@ -52,6 +52,9 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if(!PhysicsHandle)
+		return;
+		
 	// If the physics handle is attached to something move the object we're holding
 	if (PhysicsHandle->GrabbedComponent)
 		PhysicsHandle->SetTargetLocation(GetLineTraceEnd());
@@ -66,6 +69,8 @@ void UGrabber::Grab()
 	if (Hit.GetActor())
 	{
 		UPrimitiveComponent* ComponentToGrab = Hit.GetComponent();
+		if (!PhysicsHandle)
+			return;
 		PhysicsHandle->GrabComponentAtLocation(
 			ComponentToGrab,
 			NAME_None, // We don't have any skeletal mesh, this is the NONE value for a FName
@@ -77,6 +82,8 @@ void UGrabber::Grab()
 // Called by the InputComponent when the key(s) defined in Project Settings is released
 void UGrabber::Release()
 {
+	if (!PhysicsHandle)
+		return;
 	// Detach the physics handle
 	PhysicsHandle->ReleaseComponent();
 }
